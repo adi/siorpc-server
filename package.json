@@ -1,0 +1,38 @@
+{
+  "name": "siorpc-server",
+  "version": "1.0.0",
+  "description": "Socket.IO Remote Procedure Calls and Publish/Subscribe Mechanism",
+  "main": "./dist/main.js",
+  "types": "./dist/main.d.ts",
+  "scripts": {
+    "tsc": "./node_modules/.bin/tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adi/siorpc-server.git"
+  },
+  "keywords": [
+    "socket.io",
+    "rpc",
+    "pub",
+    "sub",
+    "remote",
+    "procedure",
+    "call",
+    "websocket"
+  ],
+  "author": "Adrian Punga <adrian.punga@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adi/siorpc-server/issues"
+  },
+  "homepage": "https://github.com/adi/siorpc-server#readme",
+  "dependencies": {
+    "socket.io": "latest",
+    "@types/socket.io": "latest"
+  },
+  "devDependencies": {
+    "tslint": "latest",
+    "typescript": "latest"
+  }
+}
