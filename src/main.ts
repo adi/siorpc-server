@@ -13,10 +13,6 @@ class DeclaredMethod {
     this.code = code;
   }
 }
-interface CookieAndArgs {
-  cookie: string;
-  args: any[];
-}
 interface ReturnedValueAndThrownException {
   returnedValue: any;
   thrownException: any;
@@ -51,7 +47,7 @@ export class SioRpcServer {
   }
   publish(eventName: string, ...args: any[]) {
     for (const connectedSocket of this.connectedSockets) {
-      connectedSocket.emit(`${eventName}..event`, args);
+      connectedSocket.emit(eventName, args);
     }
   }
   run() {
@@ -67,7 +63,7 @@ export class SioRpcServer {
       });
       // Make all declared methods available on this socket
       for (const declaredMethod of this.declaredMethods) {
-        socket.on(`${declaredMethod.name}..call`, (cookieAndArgs: CookieAndArgs) => {
+        socket.on(declaredMethod.name, (args: any[], returnCallback: Function) => {
           const returnMethod = (value: any, exception: Error) => {
             const returnedValue = value;
             let thrownException: any;
@@ -79,9 +75,11 @@ export class SioRpcServer {
               };
             }
             const returnedValueAndThrownException = <ReturnedValueAndThrownException> { returnedValue, thrownException };
-            socket.emit(`${declaredMethod.name}..return..${cookieAndArgs.cookie}`, returnedValueAndThrownException);
+            if (typeof returnCallback === "function") {
+              returnCallback(returnedValueAndThrownException);
+            }
           };
-          declaredMethod.code(returnMethod, cookieAndArgs.args);
+          declaredMethod.code(returnMethod, args);
         });
       }
     });
