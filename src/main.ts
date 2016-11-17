@@ -5,14 +5,6 @@ export type ReturnFunction = (returnedValue: any, thrownException: any) => any;
 export type CodeFunction = (returnMethod: ReturnFunction, args: any[]) => void;
 export type EventFunction = (...args: any[]) => void;
 
-class DeclaredMethod {
-  name: string;
-  code: CodeFunction;
-  constructor(name: string, code: CodeFunction) {
-    this.name = name;
-    this.code = code;
-  }
-}
 interface ReturnedValueAndThrownException {
   returnedValue: any;
   thrownException: any;
@@ -22,17 +14,15 @@ export class SioRpcServer {
 
   io: SocketIO.Server;
   connectedSockets: SocketIO.Socket[];
-  private declaredMethods: DeclaredMethod[];
+  private declaredMethods: { [id: string]: CodeFunction };
 
   constructor(httpServer: http.Server) {
     this.io = ioserver(httpServer);
     this.connectedSockets = [];
-    this.declaredMethods = [];
+    this.declaredMethods = {};
   }
   declare(methodName: string, methodCode: Function) {
-    this.declaredMethods.push(
-      new DeclaredMethod(
-        methodName,
+    this.declaredMethods[methodName] =
         async (returnFunction, args) => {
           let result: any;
           try {
@@ -41,9 +31,7 @@ export class SioRpcServer {
             return returnFunction(undefined, exception);
           }
           return returnFunction(result, undefined);
-        }
-      )
-    );
+        };
   }
   publish(eventName: string, ...args: any[]) {
     for (const connectedSocket of this.connectedSockets) {
@@ -62,10 +50,28 @@ export class SioRpcServer {
         }
       });
       // Make all declared methods available on this socket
-      for (const declaredMethod of this.declaredMethods) {
-        socket.on(declaredMethod.name, (args: any[], returnCallback: Function) => {
-          const returnMethod = (value: any, exception: Error) => {
-            const returnedValue = value;
+      socket.on('call', (args: any[], returnCallback: Function) => {
+        const returnMethod = (value: any, exception: Error) => {
+          const returnedValue = value;
+          let thrownException: any;
+          if (typeof exception !== 'undefined') {
+            thrownException = {
+              remote_name: exception.name,
+              remote_message: exception.message,
+              remote_stack: exception.stack,
+            };
+          }
+          const returnedValueAndThrownException = <ReturnedValueAndThrownException> { returnedValue, thrownException };
+          if (typeof returnCallback === "function") {
+            returnCallback(returnedValueAndThrownException);
+          }
+        };
+        const methodName = args.shift();
+        if ({}.hasOwnProperty.call(this.declaredMethods, methodName)) {
+          this.declaredMethods[methodName](returnMethod, args);
+        } else {
+          if (typeof returnCallback === "function") {
+            const exception = new Error(`Method '${methodName}' is not declared`);
             let thrownException: any;
             if (typeof exception !== 'undefined') {
               thrownException = {
@@ -74,14 +80,11 @@ export class SioRpcServer {
                 remote_stack: exception.stack,
               };
             }
-            const returnedValueAndThrownException = <ReturnedValueAndThrownException> { returnedValue, thrownException };
-            if (typeof returnCallback === "function") {
-              returnCallback(returnedValueAndThrownException);
-            }
-          };
-          declaredMethod.code(returnMethod, args);
-        });
-      }
+            const returnedValueAndThrownException = <ReturnedValueAndThrownException> { thrownException };
+            returnCallback(returnedValueAndThrownException);
+          }
+        }
+      });
     });
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "siorpc-server",
-  "version": "1.1.1",
+  "version": "2.0.2",
   "description": "Socket.IO Remote Procedure Calls and Publish/Subscribe Mechanism",
   "main": "./dist/main.js",
   "types": "./dist/main.d.ts",
