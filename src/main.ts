@@ -3,7 +3,6 @@ import * as ioserver from 'socket.io';
 
 export type ReturnFunction = (returnedValue: any, thrownException: any) => any;
 export type CodeFunction = (returnMethod: ReturnFunction, args: any[]) => void;
-export type EventFunction = (...args: any[]) => void;
 
 interface ReturnedValueAndThrownException {
   returnedValue: any;
