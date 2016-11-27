@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as ioserver from 'socket.io';
 
 export type ReturnFunction = (returnedValue: any, thrownException: any) => any;
-export type CodeFunction = (returnMethod: ReturnFunction, args: any[]) => void;
+export type CodeFunction = (returnMethod: ReturnFunction, args: any[]) => Promise<void>;
 
 interface ReturnedValueAndThrownException {
   returnedValue: any;
@@ -22,7 +22,7 @@ export class SioRpcServer {
   }
   declare(methodName: string, methodCode: Function) {
     this.declaredMethods[methodName] =
-        async (returnFunction, args) => {
+        async (returnFunction: ReturnFunction, args: any[]) => {
           let result: any;
           try {
             result = await methodCode.apply(null, args);

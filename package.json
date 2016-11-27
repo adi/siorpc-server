@@ -1,6 +1,6 @@
 {
   "name": "siorpc-server",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Socket.IO Remote Procedure Calls and Publish/Subscribe Mechanism",
   "main": "./dist/main.js",
   "types": "./dist/main.d.ts",
@@ -28,11 +28,13 @@
   },
   "homepage": "https://github.com/adi/siorpc-server#readme",
   "dependencies": {
-    "socket.io": "latest",
-    "@types/socket.io": "latest"
+    "@types/socket.io": "latest",
+    "es6-promise": "latest",
+    "socket.io": "latest"
   },
   "devDependencies": {
+    "@types/es6-promise": "latest",
     "tslint": "latest",
-    "typescript": "latest"
+    "typescript": "2.1.1"
   }
 }
