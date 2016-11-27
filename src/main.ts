@@ -1,8 +1,8 @@
 import * as http from 'http';
 import * as ioserver from 'socket.io';
 
-export type ReturnFunction = (returnedValue: any, thrownException: any) => any;
-export type CodeFunction = (returnMethod: ReturnFunction, args: any[]) => Promise<void>;
+export type ReturnFunction = (returnedValue: any, thrownException: any) => void;
+export type CodeFunction = (returnMethod: ReturnFunction, args: any[]) => void;
 
 interface ReturnedValueAndThrownException {
   returnedValue: any;
