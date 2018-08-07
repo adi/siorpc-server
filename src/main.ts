@@ -15,8 +15,8 @@ export class SioRpcServer {
   connectedSockets: SocketIO.Socket[];
   private declaredMethods: { [id: string]: CodeFunction };
 
-  constructor(httpServer: http.Server) {
-    this.io = ioserver(httpServer);
+  constructor(httpServer: http.Server, origins = '*:*' ) {
+    this.io = ioserver(httpServer, <ioserver.ServerOptions>{ origins });
     this.connectedSockets = [];
     this.declaredMethods = {};
   }
